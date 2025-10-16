@@ -8,6 +8,11 @@
             <label asp-for="@Model.Input">Q: ></label>
             <input asp-for="@Model.Input" class="form-control" placeholder="Q:" />
         </div>
+        <div class="form-group">
+            <label asp-for="@Model.Input">TopK</label>
+            <input asp-for="@Model.TopK" class="form-control input-group-sm" readonly"  />
+        </div>
+        
         <br />
         <button type="submit" class="btn btn-primary">Submit</button>
 

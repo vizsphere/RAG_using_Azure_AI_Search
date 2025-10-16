@@ -1,12 +1,11 @@
 ﻿using Azure.Search.Documents.Indexes;
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace _7_ElasticSearch_VectorStore_SemanticKernel.Models
 {
     public class Speaker
     {
-        
+
         [SearchableField(IsFilterable = true)]
         [JsonPropertyName("chunk")]
         public string Chunk { get; set; }

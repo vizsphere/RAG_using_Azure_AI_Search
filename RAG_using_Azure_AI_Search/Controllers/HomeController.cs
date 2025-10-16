@@ -1,5 +1,7 @@
+using _7_ElasticSearch_VectorStore_SemanticKernel.Models;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
+using Azure.Search.Documents.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -7,12 +9,7 @@ using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.TextGeneration;
 using RAG_using_Azure_AI_Search.Models;
 using System.Diagnostics;
-
-#pragma warning disable SKEXP0010 
-#pragma warning disable SKEXP0020 
-#pragma warning disable SKEXP0001 
 #pragma warning disable SKEXP0001
-
 namespace RAG_using_Azure_AI_Search.Controllers
 {
     public class HomeController : Controller
@@ -22,7 +19,6 @@ namespace RAG_using_Azure_AI_Search.Controllers
         private readonly IChatCompletionService _chatCompletionService;
         private readonly ITextGenerationService _textGenerationService;
         private readonly ITextEmbeddingGenerationService _textEmbeddingGenerationService;
-        //private readonly AzureAISearchCollection<string, Speaker> _collection;
         private readonly SearchIndexClient _indexClient;
         private readonly SearchClient _searchClient;
         private readonly AppSettings _settings;
@@ -36,7 +32,6 @@ namespace RAG_using_Azure_AI_Search.Controllers
             _textEmbeddingGenerationService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
             _indexClient = _kernel.GetRequiredService<SearchIndexClient>();
             _searchClient = _indexClient.GetSearchClient(_settings.AzureSearch.Index);
-            //_collection = _kernel.GetRequiredService<AzureAISearchCollection<string, Speaker>>();
             _logger = logger;
         }
 
@@ -48,15 +43,36 @@ namespace RAG_using_Azure_AI_Search.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(SearchTerms search)
         {
-            //ReadOnlyMemory<float> query = await _textEmbeddingGenerationService.GenerateEmbeddingsAsync(new[] { search.Input });
-            
-            //var vectorQuery = new VectorizedQuery(query)
-            //{
-            //    KNearestNeighborsCount = 3,
-            //    Fields = { "text_vector" }
-            //};
+            try
+            {
+                ReadOnlyMemory<float> query = await _textEmbeddingGenerationService.GenerateEmbeddingAsync(search.Input);
 
 
+                var vectorQuery = new VectorizedQuery(query)
+                {
+                    KNearestNeighborsCount = search.TopK,
+                    Fields = { "text_vector" }
+                };
+
+                var options = new SearchOptions
+                {
+                    VectorSearch = new VectorSearchOptions
+                    {
+                        Queries = { vectorQuery }
+                    },
+                    Size = search.TopK
+                };
+
+                var response = await _searchClient.SearchAsync<Speaker>(null, options);
+
+                search.Response = response.Value.GetResults()
+                    .Select(r => r.Document)
+                    .Aggregate(string.Empty, (current, doc) => current + ("\n" + doc.Chunk + "\n\n ----"));
+            }
+            catch (Exception ex)
+            {
+                search.Response = ex.ToString();
+            }
             return View(search);
         }
         public IActionResult Privacy()

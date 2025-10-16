@@ -1,8 +1,6 @@
-using _7_ElasticSearch_VectorStore_SemanticKernel.Models;
 using Azure;
 using Azure.Search.Documents.Indexes;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Connectors.AzureAISearch;
 using RAG_using_Azure_AI_Search.Models;
 
 #pragma warning disable SKEXP0010 
@@ -28,7 +26,7 @@ builder.Services.AddSingleton<Kernel>(s =>
     //Text Embedding Service
     kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(appSettings.AzureOpenAITextEmbedding.Model, appSettings.AzureOpenAITextEmbedding.Endpoint, appSettings.AzureOpenAITextEmbedding.ApiKey);
 
-    
+
     kernelBuilder.Services.AddSingleton<SearchIndexClient>(sp =>
         new SearchIndexClient(new Uri(appSettings.AzureSearch.Endpoint), new AzureKeyCredential(appSettings.AzureSearch.ApiKey))
     );
@@ -36,18 +34,14 @@ builder.Services.AddSingleton<Kernel>(s =>
     //Vector Store
     kernelBuilder.Services.AddAzureAISearchVectorStore(); ;
 
-    //Azure AI Search
-    //kernelBuilder.Services.AddSingleton<AzureAISearchCollection<string, Speaker>>(sp =>
-    //    new AzureAISearchCollection<string, Speaker>(
-    //        new SearchIndexClient(new Uri(appSettings.AzureSearch.Endpoint), new AzureKeyCredential(appSettings.AzureSearch.ApiKey)),
-    //        appSettings.AzureSearch.Index
-    //    )
-    //);
-
-    // Register SearchIndexClient
-    //builder.Services.AddSingleton<SearchIndexClient>(sp =>
-    //    new SearchIndexClient(new Uri(appSettings.AzureSearch.Endpoint), new AzureKeyCredential(appSettings.AzureSearch.ApiKey))
-    //);
+    /*
+        kernelBuilder.Services.AddSingleton<AzureAISearchCollection<string, Speaker>>(sp =>
+            new AzureAISearchCollection<string, Speaker>(
+                new SearchIndexClient(new Uri(appSettings.AzureSearch.Endpoint), new AzureKeyCredential(appSettings.AzureSearch.ApiKey)),
+                appSettings.AzureSearch.Index
+            )
+        );
+    */
 
     return kernelBuilder.Build();
 });

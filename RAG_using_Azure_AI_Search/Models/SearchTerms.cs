@@ -4,6 +4,8 @@
     {
         public string Input { get; set; }
 
+        public int TopK { get; set; } = 3;    
+
         public string Response { get; set; }
     }
 }
