@@ -20,3 +20,13 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+/.vs/ProjectEvaluation
+/.vs/RAG_using_Azure_AI_Search/config
+/.vs/RAG_using_Azure_AI_Search/CopilotIndices/17.14.1231.31060
+/.vs/RAG_using_Azure_AI_Search/DesignTimeBuild
+/.vs/RAG_using_Azure_AI_Search/FileContentIndex
+/.vs/RAG_using_Azure_AI_Search/v17
+/RAG_using_Azure_AI_Search/bin/Debug/net9.0
+/RAG_using_Azure_AI_Search/obj
+*.txt
+*.png
