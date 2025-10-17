@@ -3,6 +3,7 @@
 window.document.addEventListener("DOMContentLoaded", function () {
     const searchForm = document.getElementById("search-form");
     const agenticSearch = document.getElementById("agenticSearch");
+    const spinner = document.getElementById("spinner");
     searchForm.addEventListener("submit", function (event) {
 
         var url = '/ai-search';
@@ -15,7 +16,7 @@ window.document.addEventListener("DOMContentLoaded", function () {
     
         const input = document.getElementById("Input");
         const topK = document.getElementById("TopK");
-        
+        spinner.classList.remove("visually-hidden");
         fetch(url, {
             method: "POST",
             body: JSON.stringify({
@@ -29,6 +30,7 @@ window.document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 const searchResult = document.getElementById("searchResult");
                 searchResult.innerHTML = data.response;
+                spinner.classList.add("visually-hidden");
             })
     });
 
