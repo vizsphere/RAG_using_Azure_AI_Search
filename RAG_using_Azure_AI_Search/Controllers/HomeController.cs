@@ -22,16 +22,15 @@ namespace RAG_using_Azure_AI_Search.Controllers
         private readonly AppSettings _settings;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(Kernel kernel, AppSettings settings, ILogger<HomeController> logger)
+        public HomeController(Kernel kernel,  ILogger<HomeController> logger)
         {
-            _settings = settings;
             _kernel = kernel;
+            _settings = _kernel.GetRequiredService<AppSettings>();
             _chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
             _textEmbeddingGenerationService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
             _indexClient = _kernel.GetRequiredService<SearchIndexClient>();
             _searchClient = _indexClient.GetSearchClient(_settings.AzureSearch.Index);
             _logger = logger;
-
         }
 
         public IActionResult Index()

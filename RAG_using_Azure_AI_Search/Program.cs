@@ -22,6 +22,8 @@ builder.Services.AddSingleton<Kernel>(s =>
     //Create Kernel Builder
     var kernelBuilder = Kernel.CreateBuilder();
 
+    kernelBuilder.Services.AddSingleton<AppSettings>(appSettings);
+
     //Chat Completion Service
     kernelBuilder.AddAzureOpenAIChatCompletion(appSettings.AzureOpenAIChatCompletion.Model, appSettings.AzureOpenAIChatCompletion.Endpoint, appSettings.AzureOpenAIChatCompletion.ApiKey);
 
@@ -42,7 +44,6 @@ builder.Services.AddSingleton<Kernel>(s =>
     return kernelBuilder.Build();
 });
 
-builder.Services.AddSingleton<AppSettings>(appSettings);
 
 var app = builder.Build();
 

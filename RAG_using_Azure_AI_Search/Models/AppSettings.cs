@@ -16,6 +16,10 @@
         public string ApiKey { get; set; }
 
         public string Index { get; set; }
+
+        public string VectorField { get; set; } = "text_vector";
+
+        public int TopK { get; set; } = 3;
     }
 
     public class AzureOpenAIChatCompletion
