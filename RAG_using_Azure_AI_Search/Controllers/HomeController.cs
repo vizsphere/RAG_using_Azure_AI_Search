@@ -95,7 +95,7 @@ namespace RAG_using_Azure_AI_Search.Controllers
 
             var settings = new OpenAIPromptExecutionSettings() { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
 
-            var systemMessage = "You are an intelligent agent who excels in searching data in Azure AI Search"
+            var systemMessage = "You are a knowledgeable agent specialised in retrieving data using Azure AI Search."
                               + "For user prompt"
                               + "Search the speakers in Azure AI Search";
 
