@@ -40,41 +40,54 @@ namespace RAG_using_Azure_AI_Search.Controllers
             return View(new SearchTerms());
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> Index(SearchTerms search)
+        [Route("ai-search")]
+        public async Task<IActionResult> AISearch([FromBody] SearchTerms search)
         {
-            try
+            var result = new SearchResult();
+
+            if(search.Input == null || search.Input.Trim().Length == 0)
             {
-                ReadOnlyMemory<float> query = await _textEmbeddingGenerationService.GenerateEmbeddingAsync(search.Input);
-
-
-                var vectorQuery = new VectorizedQuery(query)
-                {
-                    KNearestNeighborsCount = search.TopK,
-                    Fields = { "text_vector" }
-                };
-
-                var options = new SearchOptions
-                {
-                    VectorSearch = new VectorSearchOptions
-                    {
-                        Queries = { vectorQuery }
-                    },
-                    Size = search.TopK
-                };
-
-                var response = await _searchClient.SearchAsync<Speaker>(null, options);
-
-                search.Response = response.Value.GetResults()
-                    .Select(r => r.Document)
-                    .Aggregate(string.Empty, (current, doc) => current + ("\n" + doc.Chunk + "\n\n ----"));
+                result.Response = "Please enter some search terms.";
+                
+                return BadRequest(result);
             }
-            catch (Exception ex)
+
+            ReadOnlyMemory<float> query = await _textEmbeddingGenerationService.GenerateEmbeddingAsync(search.Input);
+
+            var vectorQuery = new VectorizedQuery(query)
             {
-                search.Response = ex.ToString();
+                KNearestNeighborsCount = search.TopK,
+                Fields = { "text_vector" }
+            };
+
+            var options = new SearchOptions
+            {
+                VectorSearch = new VectorSearchOptions
+                {
+                    Queries = { vectorQuery }
+                },
+                Size = search.TopK
+            };
+
+            var response = await _searchClient.SearchAsync<Speaker>(null, options);
+
+            if (response == null || response.Value.GetResults().Count() == 0)
+            {
+                result.Response = "No results found.";
+
+                return Ok(result);
             }
-            return View(search);
+
+            result.Response = response.Value.GetResults()
+                .Select(r => r.Document)
+                .Aggregate(string.Empty, (current, doc) => current + ("\n" + doc.Chunk + "\n\n ----"));
+            
+            return Ok(result);
         }
+
+
         public IActionResult Privacy()
         {
             return View();
