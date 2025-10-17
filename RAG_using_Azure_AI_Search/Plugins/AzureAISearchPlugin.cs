@@ -24,7 +24,7 @@ namespace RAG_using_Azure_AI_Search.Plugins
         }
 
         [KernelFunction("Search")]
-        [Description("Search for a speakers.")]
+        [Description("Search for a speaker")]
         public async Task<string> SearchAsync(string query)
         {
             var _searchClient = _searchIndexClient.GetSearchClient(_appSettings.AzureSearch.Index);
