@@ -11,14 +11,31 @@
             <label asp-for="@Model.Input">Q: ></label>
             <input asp-for="@Model.Input" class="form-control" placeholder="Q:" required />
         </div>
+        <br />
         <div class="form-group">
             <label asp-for="@Model.TopK">TopK</label>
             <input asp-for="@Model.TopK" class="input-group-sm mx-1  " required />
         </div>
-        
         <br />
         <div class="form-group">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <fieldset>
+                <legend>Search type:</legend>
+
+                <div>
+                    <input type="radio" id="simpleSearch" name="search"  checked />
+                    <label for="simpleSearch">Simple Search</label>
+                </div>
+
+                <div>
+                    <input type="radio" id="agenticSearch" name="search"  />
+                    <label for="agenticSearch">Agentic Search</label>
+                </div>
+
+            </fieldset>
+        </div>
+        <br />
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Search</button>
             
         </div>
         
@@ -34,16 +51,30 @@
 
 
     <div class="form-control">
-        <span class="alert-info">Sample queries: </span>
+        <span class="alert-info">Simple Azure AI Search Queries: </span>
         <br/>
         <ol>
-
             <li>AI researcher specializing in natural language processing and machine learning.</li>
             <li>Find Solution architect and enterprise software designer with expertise</li>
-            <li>who is Samantha Rodriguez?</li>
-            <li>API gateway architect and traffic management specialist</li>
             <li>Find me list of all developers and Solution architect</li>
-            <li>3D</li>
+        </ol>
+    </div>
+
+    <div class="form-control">
+        <span class="alert-info">Agentic RAG Queries: </span>
+        <br />
+        <ol>
+
+            <li>
+                Can you list all the speakers who are AI Specialists?
+            </li>
+            <li>
+                Can you list all the speakers who are Data Scientists?
+            </li>
+            <li>
+                Can you list all the speakers who are Developers,AI Specialists, Data Scientists?
+            </li>
+            
         </ol>
     </div>
 

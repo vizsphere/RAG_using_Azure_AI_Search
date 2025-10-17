@@ -5,34 +5,33 @@ using Azure.Search.Documents.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Embeddings;
-using Microsoft.SemanticKernel.TextGeneration;
 using RAG_using_Azure_AI_Search.Models;
-using System.Diagnostics;
+
 #pragma warning disable SKEXP0001
 namespace RAG_using_Azure_AI_Search.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly Kernel _kernel;
         private readonly IChatCompletionService _chatCompletionService;
-        private readonly ITextGenerationService _textGenerationService;
         private readonly ITextEmbeddingGenerationService _textEmbeddingGenerationService;
         private readonly SearchIndexClient _indexClient;
         private readonly SearchClient _searchClient;
         private readonly AppSettings _settings;
+        private readonly ILogger<HomeController> _logger;
 
         public HomeController(Kernel kernel, AppSettings settings, ILogger<HomeController> logger)
         {
             _settings = settings;
             _kernel = kernel;
             _chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
-            _textGenerationService = _kernel.GetRequiredService<ITextGenerationService>();
             _textEmbeddingGenerationService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
             _indexClient = _kernel.GetRequiredService<SearchIndexClient>();
             _searchClient = _indexClient.GetSearchClient(_settings.AzureSearch.Index);
             _logger = logger;
+
         }
 
         public IActionResult Index()
@@ -47,10 +46,10 @@ namespace RAG_using_Azure_AI_Search.Controllers
         {
             var result = new SearchResult();
 
-            if(search.Input == null || search.Input.Trim().Length == 0)
+            if (search.Input == null || search.Input.Trim().Length == 0)
             {
                 result.Response = "Please enter some search terms.";
-                
+
                 return BadRequest(result);
             }
 
@@ -80,23 +79,43 @@ namespace RAG_using_Azure_AI_Search.Controllers
                 return Ok(result);
             }
 
-            result.Response = response.Value.GetResults()
-                .Select(r => r.Document)
-                .Aggregate(string.Empty, (current, doc) => current + ("\n" + doc.Chunk + "\n\n ----"));
-            
+            await foreach (var r in response.Value.GetResultsAsync())
+            {
+                result.Response += r.Document.Chunk ?? string.Empty + "\n\n";
+            }
+
             return Ok(result);
         }
 
 
-        public IActionResult Privacy()
+        [HttpPost]
+        [Route("agentic-ai-search")]
+        public async Task<IActionResult> AgenticAISearch([FromBody] SearchTerms search)
         {
-            return View();
-        }
+            var searchResult = new SearchResult();
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var settings = new OpenAIPromptExecutionSettings() { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
+
+            var systemMessage = "You are an intelligent agent who excels in searching data in Azure AI Search"
+                              + "For user prompt"
+                              + "Search the speakers in Azure AI Search";
+
+            var chat = new ChatHistory(systemMessage);
+
+            chat.AddUserMessage(search.Input);
+
+            var assistantReply = await _chatCompletionService.GetChatMessageContentAsync(chat, settings, _kernel);
+
+            if (assistantReply == null || assistantReply.ToString().Trim().Length == 0)
+            {
+                searchResult.Response = "No results found.";
+
+                return Ok(searchResult);
+            }
+
+            searchResult.Response = assistantReply.ToString();
+
+            return Ok(searchResult);
         }
     }
 }

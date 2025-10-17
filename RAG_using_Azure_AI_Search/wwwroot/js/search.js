@@ -2,15 +2,21 @@
 
 window.document.addEventListener("DOMContentLoaded", function () {
     const searchForm = document.getElementById("search-form");
-
+    const agenticSearch = document.getElementById("agenticSearch");
     searchForm.addEventListener("submit", function (event) {
 
+        var url = '/ai-search';
         event.preventDefault();
 
+        if (agenticSearch.checked)
+        {
+            url = '/agentic-ai-search';
+        };
+    
         const input = document.getElementById("Input");
         const topK = document.getElementById("TopK");
         
-        fetch("/ai-search", {
+        fetch(url, {
             method: "POST",
             body: JSON.stringify({
                 input : input.value,

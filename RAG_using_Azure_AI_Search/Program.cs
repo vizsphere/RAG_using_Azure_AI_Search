@@ -2,6 +2,7 @@ using Azure;
 using Azure.Search.Documents.Indexes;
 using Microsoft.SemanticKernel;
 using RAG_using_Azure_AI_Search.Models;
+using RAG_using_Azure_AI_Search.Plugins;
 
 #pragma warning disable SKEXP0010 
 
@@ -18,6 +19,7 @@ builder.Configuration.GetSection("AppSettings").Bind(appSettings);
 
 builder.Services.AddSingleton<Kernel>(s =>
 {
+    //Create Kernel Builder
     var kernelBuilder = Kernel.CreateBuilder();
 
     //Chat Completion Service
@@ -26,22 +28,16 @@ builder.Services.AddSingleton<Kernel>(s =>
     //Text Embedding Service
     kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(appSettings.AzureOpenAITextEmbedding.Model, appSettings.AzureOpenAITextEmbedding.Endpoint, appSettings.AzureOpenAITextEmbedding.ApiKey);
 
-
+    //Search Index Client
     kernelBuilder.Services.AddSingleton<SearchIndexClient>(sp =>
         new SearchIndexClient(new Uri(appSettings.AzureSearch.Endpoint), new AzureKeyCredential(appSettings.AzureSearch.ApiKey))
     );
 
     //Vector Store
-    kernelBuilder.Services.AddAzureAISearchVectorStore(); ;
+    kernelBuilder.Services.AddAzureAISearchVectorStore();
 
-    /*
-        kernelBuilder.Services.AddSingleton<AzureAISearchCollection<string, Speaker>>(sp =>
-            new AzureAISearchCollection<string, Speaker>(
-                new SearchIndexClient(new Uri(appSettings.AzureSearch.Endpoint), new AzureKeyCredential(appSettings.AzureSearch.ApiKey)),
-                appSettings.AzureSearch.Index
-            )
-        );
-    */
+    //Plugins
+    kernelBuilder.Plugins.AddFromType<AzureAISearchPlugin>("AzureAISearchPlugin");
 
     return kernelBuilder.Build();
 });

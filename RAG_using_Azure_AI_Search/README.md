@@ -39,6 +39,18 @@ Create the necessary Azure resources
 	3. Semantic Kernel will be used for enhanced search capabilities.
 
 
+### Simple AI Search queries
+    AI researcher specializing in natural language processing and machine learning
+    Find Solution architect and enterprise software designer with expertise
+    Find me list of all developers and Solution architect
 
 
-	https://medium.com/data-science-collective/step-by-step-guide-on-building-agentic-rag-with-microsoft-semantic-kernel-and-azure-ai-search-3dcee5bf38ba
+### Edge case scenarios without Agentic RAG
+
+	Can you list all the speakers who are AI Specialists?
+	Can you list all the speakers who are Developers?
+	Can you list all the speakers who are Data Scientists?
+	Can you list all the speakers who are Developers,AI Specialists, Data Scientists?
+
+
+https://medium.com/data-science-collective/step-by-step-guide-on-building-agentic-rag-with-microsoft-semantic-kernel-and-azure-ai-search-3dcee5bf38ba
