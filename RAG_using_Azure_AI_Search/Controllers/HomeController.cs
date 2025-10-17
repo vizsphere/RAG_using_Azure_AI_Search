@@ -57,7 +57,7 @@ namespace RAG_using_Azure_AI_Search.Controllers
             var vectorQuery = new VectorizedQuery(query)
             {
                 KNearestNeighborsCount = search.TopK,
-                Fields = { "text_vector" }
+                Fields = { _settings.AzureSearch.VectorField }
             };
 
             var options = new SearchOptions
@@ -69,7 +69,7 @@ namespace RAG_using_Azure_AI_Search.Controllers
                 Size = search.TopK
             };
 
-            var response = await _searchClient.SearchAsync<Speaker>(null, options);
+            var response = await _searchClient.SearchAsync<Speaker>(options);
 
             if (response == null || response.Value.GetResults().Count() == 0)
             {
@@ -96,8 +96,9 @@ namespace RAG_using_Azure_AI_Search.Controllers
             var settings = new OpenAIPromptExecutionSettings() { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
 
             var systemMessage = "You are a knowledgeable agent specialised in retrieving data using Azure AI Search."
-                              + "For user prompt"
-                              + "Search the speakers in Azure AI Search";
+                              + "For user."
+                              + "Search required information in Azure AI Search." 
+                              + "You need to be absolutely accurate about the information. If you can't find the required details, try not to find random information.";
 
             var chat = new ChatHistory(systemMessage);
 

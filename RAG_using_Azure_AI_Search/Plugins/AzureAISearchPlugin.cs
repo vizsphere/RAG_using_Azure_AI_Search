@@ -33,7 +33,7 @@ namespace RAG_using_Azure_AI_Search.Plugins
 
             var vectorQuery = new VectorizedQuery(embedding)
             {
-                KNearestNeighborsCount = _appSettings.AzureSearch.TopK,
+                //KNearestNeighborsCount = _appSettings.AzureSearch.TopK,
                 Fields = { _appSettings.AzureSearch.VectorField }
             };
 
@@ -43,10 +43,10 @@ namespace RAG_using_Azure_AI_Search.Plugins
                 {
                     Queries = { vectorQuery }
                 },
-                Size = _appSettings.AzureSearch.TopK
+                //Size = _appSettings.AzureSearch.TopK
             };
 
-            var response = await _searchClient.SearchAsync<Speaker>(null, options);
+            var response = await _searchClient.SearchAsync<Speaker>(options);
 
             await foreach (var result in response.Value.GetResultsAsync())
             {

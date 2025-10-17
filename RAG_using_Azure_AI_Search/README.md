@@ -1,4 +1,5 @@
-﻿## Azure AI Search with Retrieval-Augmented Generation (RAG)
+﻿## Agentic RAG with Microsoft Semantic Kernel and Azure AI Search
+
 
 This repository demonstrates how to implement Retrieval-Augmented Generation (RAG) using Azure AI Search and OpenAI's GPT models. The project showcases how to enhance the capabilities of language models by integrating them with a powerful search engine to retrieve relevant documents and generate more accurate and context-aware responses.
 
@@ -51,6 +52,7 @@ Create the necessary Azure resources
 	Can you list all the speakers who are Developers?
 	Can you list all the speakers who are Data Scientists?
 	Can you list all the speakers who are Developers,AI Specialists, Data Scientists?
+	Give me count of Developers,AI Specialists, Data Scientists?
 
 
 https://medium.com/data-science-collective/step-by-step-guide-on-building-agentic-rag-with-microsoft-semantic-kernel-and-azure-ai-search-3dcee5bf38ba
