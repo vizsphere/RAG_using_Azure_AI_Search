@@ -1,15 +1,22 @@
 using _7_ElasticSearch_VectorStore_SemanticKernel.Models;
+using Azure.AI.OpenAI.Chat;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Embeddings;
 using RAG_using_Azure_AI_Search.Models;
+using System.Reflection;
+using System.Text;
 
 #pragma warning disable SKEXP0001
+#pragma warning disable AOAI001
+#pragma warning disable SKEXP0010
+
 namespace RAG_using_Azure_AI_Search.Controllers
 {
     public class HomeController : Controller
@@ -91,20 +98,26 @@ namespace RAG_using_Azure_AI_Search.Controllers
         [Route("agentic-ai-search")]
         public async Task<IActionResult> AgenticAISearch([FromBody] SearchTerms search)
         {
+            var sb = new StringBuilder();
+
             var searchResult = new SearchResult();
 
-            var settings = new OpenAIPromptExecutionSettings() { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
+            //var settings = new OpenAIPromptExecutionSettings() { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
+
+            var promptExecutionSettings = new AzureOpenAIPromptExecutionSettings { AzureChatDataSource = GetAzureSearchDataSource(), ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
 
             var systemMessage = "You are a knowledgeable agent specialised in retrieving data using Azure AI Search."
                               + "For user."
                               + "Search required information in Azure AI Search." 
-                              + "You need to be absolutely accurate about the information. If you can't find the required details, try not to find random information.";
+                              + "You need to be absolutely accurate about the information. If you can't find the required details, try not to find random information."
+                              ;
 
-            var chat = new ChatHistory(systemMessage);
+            //var chat = new ChatHistory(systemMessage);
+            //chat.AddUserMessage(search.Input);
 
-            chat.AddUserMessage(search.Input);
+            var prompt = $@"{systemMessage} usermessage: {search.Input}";
 
-            var assistantReply = await _chatCompletionService.GetChatMessageContentAsync(chat, settings, _kernel);
+            var assistantReply = await _chatCompletionService.GetChatMessageContentAsync(prompt, promptExecutionSettings, _kernel);
 
             if (assistantReply == null || assistantReply.ToString().Trim().Length == 0)
             {
@@ -113,9 +126,60 @@ namespace RAG_using_Azure_AI_Search.Controllers
                 return Ok(searchResult);
             }
 
-            searchResult.Response = assistantReply.ToString();
+            var citations = GetCitations(assistantReply);
+
+            searchResult.Response = GetSearchText(citations, assistantReply);
 
             return Ok(searchResult);
         }
+
+
+        #region Private Methods
+        
+        private AzureSearchChatDataSource GetAzureSearchDataSource()
+        {
+            return new AzureSearchChatDataSource
+            {
+                Endpoint = new Uri(_settings.AzureSearch.Endpoint),
+                Authentication = DataSourceAuthentication.FromApiKey(_settings.AzureSearch.ApiKey),
+                IndexName = _settings.AzureSearch.Index
+            };
+        }
+
+        private IReadOnlyList<ChatCitation> GetCitations(ChatMessageContent chatMessageContent)
+        {
+            var message = chatMessageContent.InnerContent as OpenAI.Chat.ChatCompletion;
+            var messageContext = message.GetMessageContext();
+
+            return messageContext.Citations;
+        }
+
+        private string GetSearchText(IReadOnlyList<ChatCitation> citations, ChatMessageContent chatMessageContent)
+        {
+            var sb = new StringBuilder();
+
+
+            sb.AppendLine("Search results:");
+            sb.AppendLine(chatMessageContent.ToString());
+            sb.AppendLine("\n");
+
+            sb.AppendLine("-----------");
+            sb.AppendLine(" Citations:");
+            sb.AppendLine("-----------");
+
+            int count = 1;
+            foreach (var citation in citations)
+            {
+                sb.Append(count.ToString());
+                sb.AppendLine($"- Source: {citation.Title}: {citation.FilePath}: {citation.Url}");
+                sb.AppendLine($"- Content: {citation.Content}");
+                sb.AppendLine($"\n");
+                count += 1;
+            }
+
+            return sb.ToString();
+        }
+
+        #endregion
     }
 }
