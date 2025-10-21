@@ -48,10 +48,9 @@ Create the necessary Azure resources
 
 ### Edge case scenarios without Agentic RAG
 
-	Can you list all the speakers who are AI Specialists?
-	Can you list all the speakers who are Developers?
-	Can you list all the speakers who are Data Scientists?
-	Give list name and count of Developers?
+	Find me AI Specialists?
+	Find me Data Scientists?
+	Give me name and count of Developers?
 
 
 https://medium.com/data-science-collective/step-by-step-guide-on-building-agentic-rag-with-microsoft-semantic-kernel-and-azure-ai-search-3dcee5bf38ba

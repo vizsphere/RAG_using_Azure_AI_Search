@@ -31,3 +31,4 @@ TestResults.xml
 *.txt
 *.png
 /RAG_using_Azure_AI_Search/appsettings.json
+/RAG_using_Azure_AI_Search/appsettings.json
