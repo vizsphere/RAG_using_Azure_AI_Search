@@ -106,7 +106,8 @@ namespace RAG_using_Azure_AI_Search.Controllers
 
             var systemMessage = "You are a knowledgeable agent specialised in retrieving data using Azure AI Search."
                               + "For user."
-                              + "Search required information in Azure AI Search.";
+                              + "1) Search required information in Azure AI Search using the AzureAISearchPlugin"
+                              + "2) Use the search results to provide the user with the required information";
 
             var chatHistory = new ChatHistory(systemMessage);
             chatHistory.AddUserMessage(search.Input);
