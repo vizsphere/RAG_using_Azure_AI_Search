@@ -37,6 +37,11 @@ ASP.NET Core MVC application demonstrating Agentic Retrieval-Augmented Generatio
                   └────────────────┘
 ```
 
+
+![Agentic-Azure-AI-Search](https://github.com/user-attachments/assets/77bf8c65-aa68-42b3-8fb5-0916343ff204)
+
+
+
 ## 📋 Prerequisites
 
 - .NET 8.0 SDK or later
@@ -130,3 +135,8 @@ The application performs vector similarity search against Azure AI Search and re
 	Find me AI Specialists?
 	Find me Data Scientists?
 	Give me name and count of Developers?
+
+## 📚 Learn More
+
+Read the full blog post: [here](https://vizsphere.com/agentic-rag-with-azure-ai-search-using-microsoft-semantic-kernel/)
+
