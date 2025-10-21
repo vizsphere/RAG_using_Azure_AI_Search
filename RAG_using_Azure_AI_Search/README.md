@@ -1,56 +1,132 @@
-﻿## Agentic RAG with Microsoft Semantic Kernel and Azure AI Search
+﻿# Agentic RAG with Azure AI Search and Microsoft Semantic Kernel
 
+ASP.NET Core MVC application demonstrating Agentic Retrieval-Augmented Generation (RAG) using Microsoft Semantic Kernel and Azure AI Search. This project showcases both traditional vector search and autonomous agent-driven retrieval patterns.
 
-This repository demonstrates how to implement Retrieval-Augmented Generation (RAG) using Azure AI Search and OpenAI's GPT models. The project showcases how to enhance the capabilities of language models by integrating them with a powerful search engine to retrieve relevant documents and generate more accurate and context-aware responses.
+##  Features
 
-
-## Infrastructure Setup
-
-Create the necessary Azure resources 
+- **Dual Search Modes**
+  - Direct Vector Search: Traditional semantic search with full control
+  - Agentic RAG: Autonomous agents that dynamically retrieve and reason over data
+  
+## Architecture
 
 ```
-- [Resource Group] VizSphereDemoAzureAISearch 
-	 	
-		- [AI Foundry] vizspheredemoopenai (Azure AI Foundry)
-
-			   - ProjectName = AISearchRAG
-		
-			   - [Model] gpt-35-turbo (Base Model Deployment) Token = 20k
-			
-			   - [Embedding] text-embedding-ada-002 (Embedding Model)
-	
-		- [Storage] vizspheredemostd (Azure Storage Account)
-				- Container = data (Blob Container)
-				- Upload sample data speakers.csv 
-
-		- [AI Search] vizspheredemoazureaisearch (Azure AI Search)
+┌─────────────┐
+│   Web UI    │
+└──────┬──────┘
+       │
+┌──────▼──────────────────────────┐
+│   HomeController                │
+│  ┌──────────┐  ┌──────────────┐ │
+│  │ AISearch │  │AgenticSearch │ │
+│  └──────────┘  └──────────────┘ │
+└──────┬──────────────┬───────────┘
+       │              │
+┌──────▼──────┐  ┌───▼────────────────┐
+│  Azure AI   │  │ Semantic Kernel    │
+│   Search    │  │  ┌──────────────┐  │
+│             │  │  │ Azure AI Search │  
+│             │◄─┤  │   Plugin     │  │
+│             │  │  └──────────────┘  │
+└─────────────┘  └────────┬───────────┘
+                          │
+                  ┌───────▼────────┐
+                  │  Azure OpenAI  │
+                  │  - GPT-3.5     │
+                  │  - Embeddings  │
+                  └────────────────┘
 ```
 
+## 📋 Prerequisites
 
-## Prerequisites	
-- An Azure account with access to create resources.
-- .NET 6.0 SDK or later installed on your machine.
-- Visual Studio 2022 or later (optional but recommended).
+- .NET 8.0 SDK or later
+- Azure Subscription
+- Visual Studio 2022 or VS Code
+
+### Azure Resources Required
+
+1. **Azure AI Search**
+   - Search service (Basic tier or higher)
+   - Search index configured for vector search
+   dfwerywwhgbvcz\asa
+2. **Azure OpenAI Service**
+   - Deployment: `gpt-35-turbo`
+   - Deployment: `text-embedding-ada-002`
+
+3. **Azure Storage Account** (for data storage)
+
+4. **Resource Group** (to organize resources)
+
+## 🚀 Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/vizsphere/RAG_using_Azure_AI_Search.git
+cd RAG_using_Azure_AI_Search
+```
+
+### 2. Configure Azure Resources
+
+Update `appsettings.json` with your Azure credentials:
+
+```json
+{
+  "AppSettings": {
+    "AzureSearch": {
+      "Endpoint": "https://your-search-service.search.windows.net",
+      "Index": "your-index-name",
+      "ApiKey": "your-search-api-key",
+      "TopK": 5,
+      "VectorField": "text_vector",
+      "Size": 10
+    },
+    "AzureOpenAIChatCompletion": {
+      "Model": "gpt-35-turbo",
+      "Endpoint": "https://your-openai-service.openai.azure.com/",
+      "ApiKey": "your-openai-api-key"
+    },
+    "AzureOpenAITextEmbedding": {
+      "Model": "text-embedding-ada-002",
+      "Endpoint": "https://your-openai-service.openai.azure.com/",
+      "ApiKey": "your-openai-api-key"
+    }
+  }
+}
+```
+
+### 3. Install Dependencies
+
+```bash
+dotnet restore
+```
+
+### 4. Run the Application
+
+```bash
+dotnet run
+```
+
+Navigate to `https://localhost:5001` in your browser.
 
 
-[sample data]: # (Path: RAG_using_Azure_AI_Search/Data/sample-data.csv)]
+## 🔧 Usage
 
-	1. Upload to Azure Storage Account (vizspheredemostd) in a container named 'speaker'.
-	2. Azure AI Search (vizspheredemoazureaIsearch) will index this data.
-	3. Semantic Kernel will be used for enhanced search capabilities.
+### Basic Vector Search
 
+1. Enter your search query
+2. Set the TopK parameter (number of results)
+3. Click "Search"
+
+The application performs vector similarity search against Azure AI Search and returns relevant results.
 
 ### Simple AI Search queries
     AI researcher specializing in natural language processing and machine learning
     Find Solution architect and enterprise software designer with expertise
     Find me list of all developers and Solution architect
 
-
-### Edge case scenarios without Agentic RAG
+### Agentic RAG queries
 
 	Find me AI Specialists?
 	Find me Data Scientists?
 	Give me name and count of Developers?
-
-
-https://medium.com/data-science-collective/step-by-step-guide-on-building-agentic-rag-with-microsoft-semantic-kernel-and-azure-ai-search-3dcee5bf38ba
