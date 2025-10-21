@@ -51,8 +51,7 @@ Create the necessary Azure resources
 	Can you list all the speakers who are AI Specialists?
 	Can you list all the speakers who are Developers?
 	Can you list all the speakers who are Data Scientists?
-	Can you list all the speakers who are Developers,AI Specialists, Data Scientists?
-	Give me count of Developers,AI Specialists, Data Scientists?
+	Give list name and count of Developers?
 
 
 https://medium.com/data-science-collective/step-by-step-guide-on-building-agentic-rag-with-microsoft-semantic-kernel-and-azure-ai-search-3dcee5bf38ba

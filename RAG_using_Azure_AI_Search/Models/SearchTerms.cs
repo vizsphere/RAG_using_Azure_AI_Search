@@ -6,7 +6,9 @@ namespace RAG_using_Azure_AI_Search.Models
     {
         public string Input { get; set; }
 
-        public int TopK { get; set; } = 2;    
+        public int TopK { get; set; } = 2;
+        
+        public bool IncludeCitations { get; set; } = false;
     }
 
     public class SearchResult

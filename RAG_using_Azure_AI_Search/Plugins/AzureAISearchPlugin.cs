@@ -16,24 +16,28 @@ namespace RAG_using_Azure_AI_Search.Plugins
         private readonly SearchIndexClient _searchIndexClient;
         private readonly ITextEmbeddingGenerationService _textEmbeddingGenerationService;
         private readonly AppSettings _appSettings;
-        public AzureAISearchPlugin(SearchIndexClient searchIndexClient, ITextEmbeddingGenerationService textEmbeddingGenerationService, AppSettings appSettings)
+        private readonly ILogger<AzureAISearchPlugin> _logger;
+        public AzureAISearchPlugin(SearchIndexClient searchIndexClient, ITextEmbeddingGenerationService textEmbeddingGenerationService, AppSettings appSettings, ILogger<AzureAISearchPlugin> logger)
         {
             _searchIndexClient = searchIndexClient;
             _textEmbeddingGenerationService = textEmbeddingGenerationService;
             _appSettings = appSettings;
+            _logger = logger;
         }
 
         [KernelFunction("Search")]
         [Description("Search for a speaker")]
         public async Task<string> SearchAsync(string query)
         {
+            _logger.LogInformation("AzureAISearchPlugin SearchAsync called with query: {query}", query);
+
             var _searchClient = _searchIndexClient.GetSearchClient(_appSettings.AzureSearch.Index);
 
             ReadOnlyMemory<float> embedding = await _textEmbeddingGenerationService.GenerateEmbeddingAsync(query);
 
             var vectorQuery = new VectorizedQuery(embedding)
             {
-                //KNearestNeighborsCount = _appSettings.AzureSearch.TopK,
+                KNearestNeighborsCount = _appSettings.AzureSearch.TopK,
                 Fields = { _appSettings.AzureSearch.VectorField }
             };
 
@@ -43,7 +47,7 @@ namespace RAG_using_Azure_AI_Search.Plugins
                 {
                     Queries = { vectorQuery }
                 },
-                //Size = _appSettings.AzureSearch.TopK
+                Size = _appSettings.AzureSearch.Size
             };
 
             var response = await _searchClient.SearchAsync<Speaker>(options);

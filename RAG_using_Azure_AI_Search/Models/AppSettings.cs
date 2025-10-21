@@ -17,9 +17,11 @@
 
         public string Index { get; set; }
 
-        public string VectorField { get; set; } = "text_vector";
+        public string VectorField { get; set; }
 
-        public int TopK { get; set; } = 3;
+        public int TopK { get; set; } 
+
+        public int Size { get; set; }
     }
 
     public class AzureOpenAIChatCompletion

@@ -22,6 +22,8 @@ builder.Services.AddSingleton<Kernel>(s =>
     //Create Kernel Builder
     var kernelBuilder = Kernel.CreateBuilder();
 
+    kernelBuilder.Services.AddLogging(b => b.AddConsole().SetMinimumLevel(LogLevel.Trace));
+
     kernelBuilder.Services.AddSingleton<AppSettings>(appSettings);
 
     //Chat Completion Service

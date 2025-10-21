@@ -99,7 +99,7 @@ namespace RAG_using_Azure_AI_Search.Controllers
         public async Task<IActionResult> AgenticAISearch([FromBody] SearchTerms search)
         {
             var sb = new StringBuilder();
-
+            IReadOnlyList<ChatCitation> citations = null;
             var searchResult = new SearchResult();
 
             //var settings = new OpenAIPromptExecutionSettings() { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
@@ -108,16 +108,18 @@ namespace RAG_using_Azure_AI_Search.Controllers
 
             var systemMessage = "You are a knowledgeable agent specialised in retrieving data using Azure AI Search."
                               + "For user."
-                              + "Search required information in Azure AI Search." 
-                              + "You need to be absolutely accurate about the information. If you can't find the required details, try not to find random information."
-                              ;
+                              + "Search required information in Azure AI Search.";
 
-            //var chat = new ChatHistory(systemMessage);
-            //chat.AddUserMessage(search.Input);
+            var chatHistory = new ChatHistory(systemMessage);
+            chatHistory.AddUserMessage(search.Input);
 
-            var prompt = $@"{systemMessage} usermessage: {search.Input}";
+            _logger.LogInformation("Agentic AI Search Prompt: {prompt}", chatHistory);
 
-            var assistantReply = await _chatCompletionService.GetChatMessageContentAsync(prompt, promptExecutionSettings, _kernel);
+            var assistantReply = await _chatCompletionService.GetChatMessageContentAsync(chatHistory, promptExecutionSettings, _kernel);
+
+            _logger.LogInformation("Agentic AI Search Assistant Reply: {assistantReply}", assistantReply.ToString());
+
+            chatHistory.AddAssistantMessage(assistantReply.ToString()); 
 
             if (assistantReply == null || assistantReply.ToString().Trim().Length == 0)
             {
@@ -126,7 +128,10 @@ namespace RAG_using_Azure_AI_Search.Controllers
                 return Ok(searchResult);
             }
 
-            var citations = GetCitations(assistantReply);
+            if (search.IncludeCitations)
+            {
+                citations = GetCitations(assistantReply);
+            }
 
             searchResult.Response = GetSearchText(citations, assistantReply);
 
@@ -163,18 +168,21 @@ namespace RAG_using_Azure_AI_Search.Controllers
             sb.AppendLine(chatMessageContent.ToString());
             sb.AppendLine("\n");
 
-            sb.AppendLine("-----------");
-            sb.AppendLine(" Citations:");
-            sb.AppendLine("-----------");
-
-            int count = 1;
-            foreach (var citation in citations)
+            if(citations != null)
             {
-                sb.Append(count.ToString());
-                sb.AppendLine($"- Source: {citation.Title}: {citation.FilePath}: {citation.Url}");
-                sb.AppendLine($"- Content: {citation.Content}");
-                sb.AppendLine($"\n");
-                count += 1;
+                sb.AppendLine("-----------");
+                sb.AppendLine(" Citations:");
+                sb.AppendLine("-----------");
+
+                int count = 1;
+                foreach (var citation in citations)
+                {
+                    sb.Append(count.ToString());
+                    sb.AppendLine($"- Source: {citation.Title}: {citation.FilePath}: {citation.Url}");
+                    sb.AppendLine($"- Content: {citation.Content}");
+                    sb.AppendLine($"\n");
+                    count += 1;
+                }
             }
 
             return sb.ToString();

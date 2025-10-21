@@ -36,7 +36,10 @@
                             <input type="radio" id="agenticSearch" name="search" />
                             <label for="agenticSearch">Agentic Search</label>
                         </div>
-
+                        <div>
+                            <label for="IncludeCitations">Include Citations</label>
+                            <input type="checkbox" name="IncludeCitations"  id="IncludeCitations" value="@Model.IncludeCitations"/>
+                        </div>
                     </fieldset>
                 </div>
             </div>
@@ -75,7 +78,6 @@
             <div class="form-control">
                 <span class="alert-info fw-bold">Agentic RAG Queries: </span>
                 <ol>
-
                     <li>
                         Can you list all the speakers who are AI Specialists?
                     </li>
@@ -83,12 +85,8 @@
                         Can you list all the speakers who are Data Scientists?
                     </li>
                     <li>
-                        Can you list all the speakers who are Developers,AI Specialists, Data Scientists?
+                        Give list name and count of Developers?
                     </li>
-                    <li>
-                        Give me count of Developers,AI Specialists, Data Scientists?
-                    </li>
-
                 </ol>
             </div>
         </div>
