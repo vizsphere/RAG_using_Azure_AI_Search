@@ -102,8 +102,6 @@ namespace RAG_using_Azure_AI_Search.Controllers
             IReadOnlyList<ChatCitation> citations = null;
             var searchResult = new SearchResult();
 
-            //var settings = new OpenAIPromptExecutionSettings() { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
-
             var promptExecutionSettings = new AzureOpenAIPromptExecutionSettings { AzureChatDataSource = GetAzureSearchDataSource(), ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
 
             var systemMessage = "You are a knowledgeable agent specialised in retrieving data using Azure AI Search."
