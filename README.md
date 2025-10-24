@@ -136,7 +136,4 @@ The application performs vector similarity search against Azure AI Search and re
 	Find me Data Scientists?
 	Give me name and count of Developers?
 
-## 📚 Learn More
-
-Read the full blog post: [here](https://vizsphere.com/agentic-rag-with-azure-ai-search-using-microsoft-semantic-kernel/)
 
